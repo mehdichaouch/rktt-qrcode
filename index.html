@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎀 Une surprise t'attend…</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Pacifico&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ══════════════════════════════
+       TOKENS COMMUNS
+    ══════════════════════════════ */
+    :root {
+      --text:  #3b2a4a;
+      --muted: #8b7a9b;
+    }
+
+    /* ══════════════════════════════
+       THÈME CHAT (défaut)
+    ══════════════════════════════ */
+    body.theme-cat {
+      --bg-a: #fff8f0;
+      --bg-b: #fff0e8;
+      --bg-c: #fff8f0;
+      --card-bg: rgba(255,255,255,0.95);
+      --card-border: #ff7043;
+      --accent: #ff7043;
+      --accent2: #ffb347;
+      --progress-a: #ffb347;
+      --progress-b: #ff7043;
+      --badge-bg: #fff3e0;
+      --badge-border: #ffe0b2;
+      --badge-hover: #ffe8cc;
+      --hint-color: #ffb347;
+      --counter-strong: #ff7043;
+      --deco1: #ffb347;
+      --deco2: #ff85a1;
+      --deco3: #b39ddb;
+      --deco4: #81c784;
+      --err-badge-bg: #fce4ec;
+      --err-badge-border: #ff85a1;
+      --err-badge-color: #c2185b;
+    }
+
+    /* ══════════════════════════════
+       THÈME OURS
+    ══════════════════════════════ */
+    body.theme-bear {
+      --bg-a: #dbeafe;
+      --bg-b: #fce7f3;
+      --bg-c: #ede9fe;
+      --card-bg: rgba(255,255,255,0.88);
+      --card-border: #c4b5fd;
+      --accent: #a78bfa;
+      --accent2: #f9a8d4;
+      --progress-a: #c4b5fd;
+      --progress-b: #f9a8d4;
+      --badge-bg: linear-gradient(135deg,#ede9fe,#fce7f3);
+      --badge-border: #c4b5fd;
+      --badge-hover: #e0d9ff;
+      --hint-color: #a78bfa;
+      --counter-strong: #a78bfa;
+      --deco1: #6ec6f5;
+      --deco2: #f9a8d4;
+      --deco3: #c4b5fd;
+      --deco4: #fde68a;
+      --err-badge-bg: #fce7f3;
+      --err-badge-border: #f9a8d4;
+      --err-badge-color: #be6c8c;
+    }
+
+    html, body {
+      min-height: 100vh;
+      font-family: 'Nunito', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      transition: background 0.6s ease;
+    }
+
+    body.theme-cat  { background: linear-gradient(160deg, var(--bg-a), var(--bg-b), var(--bg-c)); }
+    body.theme-bear { background: linear-gradient(160deg, var(--bg-a), var(--bg-b), var(--bg-c)); }
+
+    /* ── DOTS (chat) ── */
+    body.theme-cat::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        radial-gradient(circle, #ffb347 4px, transparent 4px),
+        radial-gradient(circle, #ff85a1 4px, transparent 4px),
+        radial-gradient(circle, #b39ddb 4px, transparent 4px),
+        radial-gradient(circle, #81c784 4px, transparent 4px);
+      background-size: 80px 80px, 120px 120px, 60px 60px, 100px 100px;
+      background-position: 10px 10px, 40px 55px, 70px 20px, 20px 75px;
+      opacity: 0.22;
+      pointer-events: none;
+    }
+
+    /* ── NUAGES (ours) ── */
+    .cloud {
+      display: none;
+      position: fixed;
+      background: white;
+      border-radius: 50px;
+      opacity: 0.5;
+      pointer-events: none;
+      animation: driftCloud linear infinite;
+    }
+    body.theme-bear .cloud { display: block; }
+    .cloud::before, .cloud::after { content:''; position:absolute; background:white; border-radius:50%; }
+    .cloud-1 { width:120px; height:40px; top:10%; animation-duration:28s; animation-delay:-5s; }
+    .cloud-1::before { width:60px; height:60px; top:-30px; left:15px; }
+    .cloud-1::after  { width:40px; height:40px; top:-18px; left:55px; }
+    .cloud-2 { width:90px;  height:30px; top:22%; animation-duration:36s; animation-delay:-14s; }
+    .cloud-2::before { width:45px; height:45px; top:-22px; left:10px; }
+    .cloud-2::after  { width:30px; height:30px; top:-14px; left:42px; }
+    .cloud-3 { width:150px; height:45px; top:65%; animation-duration:24s; animation-delay:-8s; }
+    .cloud-3::before { width:70px; height:70px; top:-35px; left:20px; }
+    .cloud-3::after  { width:50px; height:50px; top:-22px; left:70px; }
+    @keyframes driftCloud { from { left:-200px; } to { left:calc(100vw + 200px); } }
+
+    /* ── DÉCOS flottantes ── */
+    .deco {
+      position: fixed;
+      opacity: 0.15;
+      pointer-events: none;
+      user-select: none;
+      font-size: 20px;
+      animation: floatBob ease-in-out infinite;
+    }
+    .d1 { top: 6%;  left:  4%; font-size:24px; animation-duration:3.2s; }
+    .d2 { top:12%;  right: 6%; font-size:18px; animation-duration:4s;   animation-delay:.5s; }
+    .d3 { top:50%;  left:  2%; font-size:22px; animation-duration:3.6s; animation-delay:1s; }
+    .d4 { top:42%;  right: 3%; font-size:16px; animation-duration:2.8s; animation-delay:.3s; }
+    .d5 { bottom:10%; left: 8%; font-size:20px; animation-duration:3.9s; animation-delay:.7s; }
+    .d6 { bottom:16%; right:7%; font-size:26px; animation-duration:3.1s; animation-delay:1.2s; }
+
+    .cat-deco  { display:none; }
+    .bear-deco { display:none; }
+    body.theme-cat  .cat-deco  { display:block; }
+    body.theme-bear .bear-deco { display:block; }
+
+    /* ══════════════════════════════
+       CARD
+    ══════════════════════════════ */
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border-radius: 36px;
+      padding: 44px 38px 38px;
+      max-width: 430px;
+      width: calc(100% - 36px);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.10), 0 2px 0 5px var(--card-border);
+      text-align: center;
+      position: relative;
+      z-index: 10;
+      animation: popIn 0.55s cubic-bezier(0.34,1.56,0.64,1) both;
+      transition: box-shadow 0.5s;
+    }
+
+    /* ══════════════════════════════
+       ÉCRAN CHOIX DU THÈME
+    ══════════════════════════════ */
+    #state-pick { display:none; }
+
+    .pick-title {
+      font-family: 'Pacifico', cursive;
+      font-size: clamp(22px, 6vw, 28px);
+      color: var(--text);
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+    .pick-sub {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+    .pick-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+    }
+    .pick-btn {
+      flex: 1;
+      max-width: 160px;
+      background: white;
+      border: 3px solid #e5e5e5;
+      border-radius: 24px;
+      padding: 20px 12px;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.2s, box-shadow 0.2s;
+      font-family: 'Nunito', sans-serif;
+    }
+    .pick-btn:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.10); }
+    .pick-btn.cat:hover  { border-color: #ff7043; }
+    .pick-btn.bear:hover { border-color: #a78bfa; }
+    .pick-btn .pick-emoji { font-size: 52px; display:block; margin-bottom:10px; }
+    .pick-btn .pick-label {
+      font-size: 15px;
+      font-weight: 900;
+      color: var(--text);
+      display:block;
+    }
+    .pick-btn .pick-desc {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+      display:block;
+    }
+
+    /* ══════════════════════════════
+       REDIRECT
+    ══════════════════════════════ */
+    #state-redirect { display:none; }
+
+    .mascot-wrap { margin-bottom: 14px; display:inline-block; }
+    .mascot-svg {
+      width:130px; height:130px;
+      filter: drop-shadow(0 6px 16px rgba(0,0,0,0.12));
+      animation: floatBob 2.2s ease-in-out infinite;
+    }
+
+    /* cat animations */
+    .cat-tail   { animation: wagTail 1.2s ease-in-out infinite alternate; }
+    .cat-eye-l, .cat-eye-r { animation: blinkRare 9s ease-in-out infinite; animation-delay: 1.5s; }
+    /* bear animations */
+    .bear-eye-l, .bear-eye-r { animation: blinkRare 9s ease-in-out infinite; }
+    .bear-arm   { animation: waveArmL 2s ease-in-out infinite alternate; }
+    .bear-arm-r { animation: waveArmR 2s ease-in-out infinite alternate; }
+
+    .title {
+      font-family: 'Pacifico', cursive;
+      font-size: clamp(24px, 7vw, 32px);
+      margin-bottom: 10px;
+      line-height: 1.25;
+    }
+    body.theme-cat  .title { color: var(--accent); }
+    body.theme-bear .title {
+      background: linear-gradient(135deg, #a78bfa, #f9a8d4, #6ec6f5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle { font-size:15px; color:var(--muted); line-height:1.75; margin-bottom:22px; }
+    .subtitle strong { color: var(--text); }
+
+    /* Badge URL */
+    .dest-badge {
+      display:flex; align-items:flex-start; gap:8px;
+      background: var(--badge-bg);
+      border: 2px solid var(--badge-border);
+      border-radius: 16px;
+      padding: 10px 14px;
+      font-size: 11px; color: var(--muted);
+      word-break: break-all; line-height:1.5;
+      margin-bottom: 8px; text-align:left;
+      text-decoration:none;
+      transition: transform 0.15s, border-color 0.2s, box-shadow 0.2s;
+    }
+    .dest-badge:hover { transform:translateY(-3px); border-color:var(--accent); box-shadow:0 4px 16px rgba(0,0,0,0.08); }
+    .dest-icon { font-size:18px; flex-shrink:0; margin-top:1px; }
+
+    .click-hint { font-size:12px; color:var(--hint-color); font-weight:900; margin-bottom:18px; }
+
+    /* Progress */
+    .progress-wrap { background:#f0e8e0; border-radius:99px; height:14px; overflow:visible; margin-bottom:12px; position:relative; }
+    body.theme-bear .progress-wrap { background:#ede9fe; }
+    .progress-bar {
+      height:100%;
+      background: linear-gradient(90deg, var(--progress-a), var(--progress-b));
+      border-radius:99px; width:0%;
+      transition: width 5s linear;
+      position:relative;
+    }
+    .bar-runner { position:absolute; right:-14px; top:50%; transform:translateY(-50%); font-size:22px; line-height:1; pointer-events:none; }
+
+    .counter { font-size:13px; color:var(--muted); font-weight:700; }
+    .counter strong { color:var(--counter-strong); font-size:16px; }
+
+    /* ══════════════════════════════
+       404
+    ══════════════════════════════ */
+    #state-404 { display:none; }
+
+    .sad-mascot { font-size:88px; display:block; margin-bottom:6px; animation:wobble 2.2s ease-in-out infinite; }
+    .err-title {
+      font-family:'Pacifico',cursive;
+      font-size: clamp(20px, 6vw, 28px);
+      margin-bottom:14px;
+    }
+    body.theme-cat  .err-title { color: var(--accent); }
+    body.theme-bear .err-title {
+      background: linear-gradient(135deg, #f9a8d4, #a78bfa);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .err-body { font-size:14px; color:var(--muted); line-height:1.8; margin-bottom:20px; }
+    .err-body strong { color:var(--text); }
+    .err-token {
+      display:none;
+      background: var(--err-badge-bg);
+      border:2px dashed var(--err-badge-border);
+      border-radius:12px;
+      padding:8px 16px;
+      font-size:11px; color:var(--err-badge-color);
+      letter-spacing:0.08em; font-weight:700;
+    }
+
+    /* ══════════════════════════════
+       BOUTON CHANGER DE THÈME
+    ══════════════════════════════ */
+    .switch-theme {
+      position: fixed;
+      bottom: 16px; right: 16px;
+      background: white;
+      border: 2px solid #e5e5e5;
+      border-radius: 99px;
+      padding: 6px 14px;
+      font-size: 12px; font-weight:700;
+      color: var(--muted);
+      cursor: pointer;
+      font-family:'Nunito',sans-serif;
+      transition: transform 0.15s, border-color 0.2s;
+      z-index: 100;
+    }
+    .switch-theme:hover { transform:scale(1.05); border-color: var(--accent); }
+
+    /* ══════════════════════════════
+       KEYFRAMES
+    ══════════════════════════════ */
+    @keyframes popIn {
+      from { opacity:0; transform:scale(0.82) translateY(28px); }
+      to   { opacity:1; transform:scale(1) translateY(0); }
+    }
+    @keyframes floatBob {
+      0%,100% { transform:translateY(0); }
+      50%     { transform:translateY(-10px); }
+    }
+    @keyframes blinkRare {
+      0%,92%,100% { transform:scaleY(1); }
+      96%          { transform:scaleY(0.08); }
+    }
+    @keyframes blink {
+      0%,88%,100% { transform:scaleY(1); }
+      93%          { transform:scaleY(0.08); }
+    }
+    @keyframes wagTail {
+      from { transform:rotate(-28deg); }
+      to   { transform:rotate(22deg); }
+    }
+    @keyframes waveArmL {
+      from { transform: rotate(30deg); }
+      to   { transform: rotate(-55deg); }
+    }
+    @keyframes waveArmR {
+      from { transform: rotate(-30deg); }
+      to   { transform: rotate(55deg); }
+    }
+    @keyframes wobble {
+      0%,100% { transform:rotate(-7deg); }
+      50%     { transform:rotate(7deg); }
+    }
+
+    /* ══════════════════════════════
+       CONFETTIS
+    ══════════════════════════════ */
+    #confetti-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* ══════════════════════════════
+       BULLE MASCOTTE
+    ══════════════════════════════ */
+    .mascot-wrap { position: relative; cursor: pointer; }
+
+    .speech-bubble {
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-50%) scale(0);
+      background: white;
+      border: 2.5px solid var(--card-border, #ff7043);
+      border-radius: 16px;
+      padding: 6px 12px;
+      font-size: 15px;
+      font-weight: 900;
+      color: var(--text);
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 20;
+      transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      font-family: 'Nunito', sans-serif;
+    }
+    .speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -9px;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: white;
+    }
+    .speech-bubble::before {
+      content: '';
+      position: absolute;
+      bottom: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: var(--card-border, #ff7043);
+    }
+    .speech-bubble.visible { transform: translateX(-50%) scale(1); }
+
+    @keyframes mascotBounce {
+      0%   { transform: translateY(0) scale(1); }
+      25%  { transform: translateY(-22px) scale(1.08); }
+      55%  { transform: translateY(-8px) scale(0.96); }
+      75%  { transform: translateY(-14px) scale(1.03); }
+      100% { transform: translateY(0) scale(1); }
+    }
+    .mascot-svg.bouncing {
+      animation: mascotBounce 0.6s ease both !important;
+    }
+  </style>
+</head>
+<body class="theme-cat">
+
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Clouds (ours only) -->
+  <div class="cloud cloud-1"></div>
+  <div class="cloud cloud-2"></div>
+  <div class="cloud cloud-3"></div>
+
+  <!-- Décos chat -->
+  <span class="deco cat-deco d1">🐾</span>
+  <span class="deco cat-deco d2">🐾</span>
+  <span class="deco cat-deco d3">🐾</span>
+  <span class="deco cat-deco d4">🐾</span>
+  <span class="deco cat-deco d5">🐾</span>
+  <span class="deco cat-deco d6">🐾</span>
+
+  <!-- Décos ours -->
+  <span class="deco bear-deco d1">🌈</span>
+  <span class="deco bear-deco d2">⭐</span>
+  <span class="deco bear-deco d3">💜</span>
+  <span class="deco bear-deco d4">🌸</span>
+  <span class="deco bear-deco d5">⭐</span>
+  <span class="deco bear-deco d6">🌈</span>
+
+  <div class="card">
+
+    <!-- ══ CHOIX DU THÈME ══ -->
+    <div id="state-pick">
+      <div class="pick-title">C'est une surprise ! 🎁</div>
+      <div class="pick-sub">
+        Mais d'abord… une question <em>cruciale</em> :<br>
+        tu es plutôt de quel côté ?
+      </div>
+      <div class="pick-buttons">
+        <button class="pick-btn cat" onclick="choosePick('cat')">
+          <span class="pick-emoji">🐱</span>
+          <span class="pick-label">Chat</span>
+          <span class="pick-desc">Team moustaches & ronronnement</span>
+        </button>
+        <button class="pick-btn bear" onclick="choosePick('bear')">
+          <span class="pick-emoji">🐻</span>
+          <span class="pick-label">Bisounours</span>
+          <span class="pick-desc">Team arc-en-ciel & câlins</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ══ REDIRECT ══ -->
+    <div id="state-redirect">
+
+      <!-- SVG CHAT — kawaii bébé chat roux, oreilles pointues -->
+      <div class="mascot-wrap" id="mascot-cat" onclick="mascotClick('cat')">
+        <div class="speech-bubble" id="bubble-cat"></div>
+        <svg class="mascot-svg" viewBox="0 0 130 165" xmlns="http://www.w3.org/2000/svg">
+          <!-- body rond -->
+          <ellipse cx="65" cy="132" rx="38" ry="30" fill="#ff9558"/>
+          <!-- belly -->
+          <ellipse cx="65" cy="137" rx="23" ry="18" fill="#ffe0c4"/>
+          <!-- taches ventre -->
+          <circle cx="58" cy="132" r="4"   fill="#ff8c42" opacity="0.18"/>
+          <circle cx="72" cy="138" r="3.5" fill="#ff8c42" opacity="0.18"/>
+          <!-- HEAD extra round -->
+          <circle cx="65" cy="60" r="54" fill="#ff9558"/>
+          <!-- oreilles POINTUES avec intérieur rose -->
+          <polygon points="20,28 10,2 42,22" fill="#ff9558"/>
+          <polygon points="23,27 16,9 40,22" fill="#ffb38a"/>
+          <polygon points="110,28 120,2 88,22" fill="#ff9558"/>
+          <polygon points="107,27 114,9 90,22" fill="#ffb38a"/>
+          <!-- rayures front -->
+          <path d="M53,20 Q65,15 77,20" stroke="#e8622a" stroke-width="2"   fill="none" stroke-linecap="round" opacity="0.35"/>
+          <path d="M56,29 Q65,25 74,29" stroke="#e8622a" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.25"/>
+          <!-- joues mega -->
+          <ellipse cx="20" cy="72" rx="16" ry="12" fill="#ffb347" opacity="0.4"/>
+          <ellipse cx="110" cy="72" rx="16" ry="12" fill="#ffb347" opacity="0.4"/>
+          <circle cx="18"  cy="76" r="3" fill="#f97316" opacity="0.28"/>
+          <circle cx="112" cy="76" r="3" fill="#f97316" opacity="0.28"/>
+          <!-- eyes ÉNORMES -->
+          <circle cx="44" cy="58" r="17" fill="white" class="cat-eye-l"/>
+          <circle cx="44" cy="59" r="11" fill="#1a3a0a"/>
+          <circle cx="47" cy="53" r="5"  fill="white"/>
+          <circle cx="40" cy="63" r="2"  fill="white"/>
+          <circle cx="86" cy="58" r="17" fill="white" class="cat-eye-r"/>
+          <circle cx="86" cy="59" r="11" fill="#1a3a0a"/>
+          <circle cx="89" cy="53" r="5"  fill="white"/>
+          <circle cx="82" cy="63" r="2"  fill="white"/>
+          <!-- reflet doré dans œil droit -->
+          <circle cx="90" cy="63" r="2.5" fill="#fde68a" opacity="0.65"/>
+          <!-- sparkles -->
+          <path d="M10,44 L11.2,39 L12.4,44 L16.4,45.2 L12.4,46.4 L11.2,51 L10,46.4 L6,45.2Z" fill="#fde68a"/>
+          <path d="M112,42 L113,38 L114,42 L118,43 L114,44 L113,48 L112,44 L108,43Z" fill="#c4b5fd"/>
+          <!-- nez rond -->
+          <circle cx="65" cy="72" r="5.5" fill="#f43f5e"/>
+          <!-- bouche W ouverte -->
+          <path d="M54,79 Q59,89 65,85 Q71,89 76,79" stroke="#c0504a" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- petite langue -->
+          <ellipse cx="65" cy="87" rx="5" ry="3.5" fill="#f9a8d4"/>
+          <!-- moustaches blanches -->
+          <line x1="22" y1="70" x2="48" y2="73" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+          <line x1="20" y1="77" x2="48" y2="77" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+          <line x1="82" y1="73" x2="108" y2="70" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+          <line x1="82" y1="77" x2="110" y2="77" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+          <!-- queue animée -->
+          <g class="cat-tail" style="transform-origin:100px 148px">
+            <path d="M100,148 Q126,136 120,116 Q116,103 106,110" stroke="#ff9558" stroke-width="9" fill="none" stroke-linecap="round"/>
+          </g>
+          <!-- pattes rondes -->
+          <ellipse cx="44" cy="157" rx="16" ry="9" fill="#ff9558"/>
+          <ellipse cx="86" cy="157" rx="16" ry="9" fill="#ff9558"/>
+        </svg>
+      </div>
+
+      <!-- SVG BISOUNOURS — kawaii chibi version A -->
+      <div class="mascot-wrap" id="mascot-bear" style="display:none" onclick="mascotClick('bear')">
+        <div class="speech-bubble" id="bubble-bear"></div>
+        <svg class="mascot-svg" viewBox="0 0 130 165" xmlns="http://www.w3.org/2000/svg">
+          <!-- body small (chibi = grosse tête) -->
+          <ellipse cx="65" cy="130" rx="34" ry="28" fill="#ffb7d5"/>
+          <!-- belly -->
+          <ellipse cx="65" cy="135" rx="20" ry="16" fill="#ffdeed"/>
+          <!-- heart on belly -->
+          <path d="M65,143 C65,143 57,137 57,132 C57,128 60,126 63,128 C64,129 65,131 65,131 C65,131 66,129 67,128 C70,126 73,128 73,132 C73,137 65,143 65,143Z" fill="#f472b6" opacity="0.75"/>
+          <!-- rainbow on belly -->
+          <path d="M46,138 Q65,126 84,138" stroke="#6ec6f5" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.55"/>
+          <path d="M49,142 Q65,132 81,142" stroke="#a78bfa" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.45"/>
+          <!-- HEAD — mega round, takes most of the space -->
+          <circle cx="65" cy="62" r="54" fill="#ffb7d5"/>
+          <!-- ears big round -->
+          <circle cx="20" cy="24" r="20" fill="#ffb7d5"/>
+          <circle cx="20" cy="24" r="13" fill="#ffdeed"/>
+          <circle cx="110" cy="24" r="20" fill="#ffb7d5"/>
+          <circle cx="110" cy="24" r="13" fill="#ffdeed"/>
+          <!-- cheeks BIG blush -->
+          <ellipse cx="24" cy="72" rx="14" ry="10" fill="#f9a8d4" opacity="0.55"/>
+          <ellipse cx="106" cy="72" rx="14" ry="10" fill="#f9a8d4" opacity="0.55"/>
+          <!-- blush dots -->
+          <circle cx="22" cy="75" r="2.5" fill="#f472b6" opacity="0.35"/>
+          <circle cx="108" cy="75" r="2.5" fill="#f472b6" opacity="0.35"/>
+          <!-- eyes HUGE sparkly -->
+          <circle cx="44" cy="60" r="14" fill="white" class="bear-eye-l"/>
+          <circle cx="44" cy="61" r="9"  fill="#2d1b4e"/>
+          <circle cx="46" cy="57" r="4"  fill="white"/>
+          <circle cx="40" cy="63" r="1.5" fill="white"/>
+          <circle cx="86" cy="60" r="14" fill="white" class="bear-eye-r"/>
+          <circle cx="86" cy="61" r="9"  fill="#2d1b4e"/>
+          <circle cx="88" cy="57" r="4"  fill="white"/>
+          <circle cx="82" cy="63" r="1.5" fill="white"/>
+          <!-- star sparkles -->
+          <path d="M13,46 L14.5,41 L16,46 L21,47.5 L16,49 L14.5,54 L13,49 L8,47.5Z" fill="#fde68a"/>
+          <path d="M111,44 L112,40 L113,44 L117,45.5 L113,47 L112,51 L111,47 L107,45.5Z" fill="#c4b5fd"/>
+          <!-- nose round -->
+          <ellipse cx="65" cy="75" rx="7" ry="5" fill="#e879a0"/>
+          <!-- mouth kawaii W -->
+          <path d="M54,82 Q59,90 65,86 Q71,90 76,82" stroke="#c0506e" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- arms — pivot depuis l'épaule, mouvement bas → haut -->
+          <g class="bear-arm" style="transform-origin:34px 114px">
+            <ellipse cx="34" cy="128" rx="11" ry="20" fill="#ffb7d5"/>
+          </g>
+          <g class="bear-arm-r" style="transform-origin:96px 114px">
+            <ellipse cx="96" cy="128" rx="11" ry="20" fill="#ffb7d5"/>
+          </g>
+          <!-- feet -->
+          <ellipse cx="46" cy="154" rx="16" ry="9" fill="#ffb7d5"/>
+          <ellipse cx="84" cy="154" rx="16" ry="9" fill="#ffb7d5"/>
+        </svg>
+      </div>
+
+      <div class="title" id="redirect-title"></div>
+      <div class="subtitle" id="redirect-sub"></div>
+
+      <a class="dest-badge" id="dest-link" href="#" target="_blank" rel="noopener">
+        <span class="dest-icon">🔗</span>
+        <span id="dest-url"></span>
+      </a>
+      <div class="click-hint">👆 Tu peux cliquer si tu es impatiente !</div>
+
+      <div class="progress-wrap">
+        <div class="progress-bar" id="progress-bar">
+          <span class="bar-runner" id="bar-runner"></span>
+        </div>
+      </div>
+      <div class="counter" id="counter"></div>
+    </div>
+
+    <!-- ══ 404 ══ -->
+    <div id="state-404">
+      <span class="sad-mascot" id="sad-mascot"></span>
+      <div class="err-title" id="err-title"></div>
+      <div class="err-body" id="err-body"></div>
+      <div class="err-token" id="err-token"></div>
+    </div>
+
+  </div>
+
+  <!-- Bouton changer de thème (visible après le choix) -->
+  <button class="switch-theme" id="switch-btn" style="display:none" onclick="resetTheme()">
+    🔄 Changer de style
+  </button>
+
+  <script>
+    // ─────────────────────────────────────────────────────────
+    // ROUTING TABLE
+    // Pour retirer une destination, supprimez juste la ligne.
+    // ─────────────────────────────────────────────────────────
+    const ROUTES = {
+      YaxjFmWmxiqwzZda: "https://youtu.be/diKNJvQYwmg",
+      pJJvGBYXJNeiAXXS: "https://youtu.be/O5powUAiwTg",
+      qsQseBoNTafEbtnS: "https://youtu.be/coAxShKTtjA",
+    };
+
+    const DELAY = 5;
+    const STORAGE_KEY = 'rktt-theme';
+
+    // Textes par thème
+    const COPY = {
+      cat: {
+        redirectTitle: "Hop hop hop ! 🚀",
+        redirectSub:   "Mon chat a reniflé le QR code et m'a dit :<br><strong>« Vas-y, c'est par là ! »</strong><br>Je t'emmène vers ta surprise… 🎁",
+        counterTick:   (t) => `Départ dans <strong>${t}</strong> s 🐾`,
+        counterGo:     "C'est parti ! 🐱💨",
+        runner:        "🐱",
+        sadMascot:     "🙀",
+        errTitle:      "Miaou… 404 !",
+        errBody:       `Mon chat a cherché partout —<br>sous le canapé, derrière le frigo,<br>même dans la litière — <strong>mais ce lien a disparu.</strong><br><br>Soit le QR code est périmé, soit quelqu'un a mangé la destination. 🐟 Mystère.<br><br>Si besoin d'aide appelle 🐻`,
+      },
+      bear: {
+        redirectTitle: "Ours-mais tu es là ! 🌈",
+        redirectSub:   "Grosbisou a scanné le QR code avec<br><strong>son gros museau tout doux</strong><br>et il t'emmène vers ta surprise ! 🎁✨",
+        counterTick:   (t) => `Départ dans <strong>${t}</strong> s 🌈`,
+        counterGo:     "C'est parti ! 🐻💨",
+        runner:        "🐻",
+        sadMascot:     "🐻",
+        errTitle:      "C'est grizzli-ant… 404 !",
+        errBody:       `Grosbisou a cherché partout dans le Pays des Bisounours —<br>sur chaque nuage, derrière chaque arc-en-ciel,<br>même dans le pot de miel —<br><strong>mais ce lien a disparu dans les étoiles.</strong><br><br>Soit le QR code est périmé, soit quelqu'un a mangé la destination. 🍯 Mystère.<br><br>Si besoin d'aide appelle 🐻`,
+      }
+    };
+
+    // ── État global ──
+    const params = new URLSearchParams(window.location.search);
+    const token  = params.get("r");
+    const target = token ? ROUTES[token] : null;
+    let   savedTheme = localStorage.getItem(STORAGE_KEY); // 'cat' | 'bear' | null
+
+    function applyTheme(theme) {
+      document.body.className = 'theme-' + theme;
+    }
+
+    function choosePick(theme) {
+      localStorage.setItem(STORAGE_KEY, theme);
+      savedTheme = theme;
+      applyTheme(theme);
+      document.getElementById('state-pick').style.display = 'none';
+      document.getElementById('switch-btn').style.display = 'block';
+      target ? showRedirect(target, theme) : show404(token, theme);
+    }
+
+    function resetTheme() {
+      localStorage.removeItem(STORAGE_KEY);
+      location.reload();
+    }
+
+    function showRedirect(url, theme) {
+      const c = COPY[theme];
+      document.getElementById('state-redirect').style.display = 'block';
+
+      launchConfetti();
+
+      // Mascot
+      document.getElementById('mascot-cat').style.display  = theme === 'cat'  ? 'inline-block' : 'none';
+      document.getElementById('mascot-bear').style.display = theme === 'bear' ? 'inline-block' : 'none';
+
+      document.getElementById('redirect-title').innerHTML = c.redirectTitle;
+      document.getElementById('redirect-sub').innerHTML   = c.redirectSub;
+      document.getElementById('dest-url').textContent     = url;
+      document.getElementById('dest-link').href           = url;
+      document.getElementById('bar-runner').textContent   = c.runner;
+
+      const bar     = document.getElementById('progress-bar');
+      const counter = document.getElementById('counter');
+      let   t       = DELAY;
+
+      counter.innerHTML = c.counterTick(t);
+      requestAnimationFrame(() => { bar.style.width = '100%'; });
+
+      const tick = setInterval(() => {
+        t--;
+        if (t > 0) {
+          counter.innerHTML = c.counterTick(t);
+        } else {
+          counter.innerHTML = c.counterGo;
+          clearInterval(tick);
+          window.location.replace(url);
+        }
+      }, 1000);
+    }
+
+    function show404(token, theme) {
+      const c = COPY[theme];
+      document.getElementById('state-404').style.display = 'block';
+      document.getElementById('sad-mascot').textContent  = c.sadMascot;
+      document.getElementById('err-title').textContent   = c.errTitle;
+      document.getElementById('err-body').innerHTML      = c.errBody;
+      if (token) {
+        const el = document.getElementById('err-token');
+        el.textContent    = 'Token mystérieux : ' + token;
+        el.style.display  = 'inline-block';
+      }
+    }
+
+    // ── INIT ──
+    if (savedTheme) {
+      applyTheme(savedTheme);
+      document.getElementById('switch-btn').style.display = 'block';
+      target ? showRedirect(target, savedTheme) : show404(token, savedTheme);
+    } else {
+      applyTheme('cat');
+      document.getElementById('state-pick').style.display = 'block';
+    }
+
+    // ══════════════════════════════════════════════
+    // CONFETTIS
+    // ══════════════════════════════════════════════
+    function launchConfetti() {
+      const canvas = document.getElementById('confetti-canvas');
+      const ctx    = canvas.getContext('2d');
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const COLORS = ['#ff9558','#ffb347','#ff85a1','#a78bfa','#6ec6f5','#fde68a','#86efac','#f9a8d4'];
+      const pieces = Array.from({ length: 120 }, () => ({
+        x:    Math.random() * canvas.width,
+        y:    -10 - Math.random() * 80,
+        w:    6 + Math.random() * 8,
+        h:    10 + Math.random() * 6,
+        color: COLORS[Math.floor(Math.random() * COLORS.length)],
+        rot:  Math.random() * Math.PI * 2,
+        vx:   (Math.random() - 0.5) * 3,
+        vy:   2.5 + Math.random() * 3,
+        vr:   (Math.random() - 0.5) * 0.2,
+        wobble: Math.random() * Math.PI * 2,
+        wobbleSpeed: 0.05 + Math.random() * 0.05,
+      }));
+
+      let frame;
+      const start = performance.now();
+
+      function draw(now) {
+        const elapsed = now - start;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        let alive = 0;
+        for (const p of pieces) {
+          p.wobble += p.wobbleSpeed;
+          p.x  += p.vx + Math.sin(p.wobble) * 0.8;
+          p.y  += p.vy;
+          p.rot += p.vr;
+          if (p.y < canvas.height + 20) alive++;
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = elapsed < 2800 ? 1 : Math.max(0, 1 - (elapsed - 2800) / 600);
+          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          ctx.restore();
+        }
+
+        if (alive > 0 && elapsed < 3600) {
+          frame = requestAnimationFrame(draw);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      }
+      frame = requestAnimationFrame(draw);
+    }
+
+    // ══════════════════════════════════════════════
+    // BULLE + BOND sur clic mascotte
+    // ══════════════════════════════════════════════
+    const MASCOT_LINES = {
+      cat:  ["Miaou ! 😸", "Ronron… 💤", "🐟 ?!", "Attrape-moi si tu peux !", "Purrr… 🧡", "Je t'avais dit que c'était par là !"],
+      bear: ["Câlin ! 🤗", "Ours-courez ! 🌈", "🍯 Miam !", "Bisounours t'aime !", "Arc-en-ciiiel !", "Grosbisou approuve ! ✨"],
+    };
+    const bubbleTimers = {};
+
+    function mascotClick(theme) {
+      const svg    = document.querySelector(`#mascot-${theme} .mascot-svg`);
+      const bubble = document.getElementById(`bubble-${theme}`);
+      const lines  = MASCOT_LINES[theme];
+
+      // Bond
+      svg.classList.remove('bouncing');
+      void svg.offsetWidth; // reflow pour relancer
+      svg.classList.add('bouncing');
+      svg.addEventListener('animationend', () => {
+        svg.classList.remove('bouncing');
+      }, { once: true });
+
+      // Bulle
+      bubble.textContent = lines[Math.floor(Math.random() * lines.length)];
+      bubble.classList.add('visible');
+
+      clearTimeout(bubbleTimers[theme]);
+      bubbleTimers[theme] = setTimeout(() => {
+        bubble.classList.remove('visible');
+      }, 1800);
+    }
+  </script>
+</body>
+</html>
